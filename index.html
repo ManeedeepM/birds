@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Events Demo – with Marquee & Time on Resize</title>
+
+<style>
+  :root{
+    --bg-start:#eef7ff;
+    --bg-end:#f5f0ff;
+    --hover-bg:#fffbd1;
+    --kbd-bg:#d1f7ff;
+    --focus-bg:#f3f0ff;
+    --error-bg:#ffede6;
+    --flash-bg:#e3ffe1;
+    --scroll-bg:#fff2e6;
+  }
+  body{
+    margin:0;padding:2rem;
+    font-family:system-ui,sans-serif;
+    background:linear-gradient(to bottom,var(--bg-start),var(--bg-end));
+    min-height:100dvh;transition:background-color .4s;
+  }
+  h1{opacity:0;transform:translateY(-10px);
+     transition:opacity .6s ease,transform .6s ease;}
+
+  /* marquee */
+  #birdBanner{
+    font-size:1.25rem;font-weight:700;color:#2d8cf0;
+    margin-bottom:1rem;
+  }
+
+  /* gallery */
+  .test{display:flex;gap:1rem;margin-bottom:2rem;position:relative;}
+  .test.sticky{position:fixed;top:0;left:0;right:0;z-index:999;
+               background:inherit;padding:1rem 2rem;
+               box-shadow:0 2px 8px rgba(0,0,0,.08);}
+  .test a{text-decoration:none;font-weight:600;text-align:center;
+          padding:.25rem;border-radius:8px;transition:background-color .25s;}
+  .test img{display:block;width:150px;height:100px;object-fit:cover;
+            border-radius:6px;margin-bottom:.25rem;transition:opacity .2s;}
+
+  /* dynamic feedback classes */
+  .hover-bg{background:var(--hover-bg);}
+  .kbd-bg{background:var(--kbd-bg);}
+  .focus-bg{background:var(--focus-bg);}
+  .error-bg{background:var(--error-bg);}
+  .flash-bg{background:var(--flash-bg)!important;}
+
+  /* form */
+  form{max-width:260px;transition:background-color .3s;}
+  input[type="email"]{
+    width:100%;padding:.5rem .75rem;border:2px solid #ccc;border-radius:6px;
+    font-size:1rem;transition:border-color .2s,box-shadow .2s,background-color .25s;
+  }
+  input[type="email"]:focus{
+    border-color:#2d8cf0;outline:none;
+    box-shadow:0 0 0 3px rgba(45,140,240,.25);
+  }
+  button{
+    margin-top:.5rem;padding:.5rem .9rem;border:none;border-radius:6px;
+    cursor:pointer;background:#2d8cf0;color:#fff;font-weight:600;
+  }
+  .char-count{font-size:.8rem;color:#666;margin-top:.25rem;}
+
+  /* viewport + time badge */
+  #sizeBadge{
+    position:fixed;bottom:10px;right:10px;
+    background:#000;color:#fff;font-size:.75rem;
+    padding:4px 8px;border-radius:4px;opacity:.85;
+    pointer-events:none;white-space:nowrap;
+  }
+</style>
+</head>
+<body>
+
+<!-- marquee banner added dynamically on DOMContentLoaded -->
+
+<h1 id="title">Interactive Events Playground 🦜</h1>
+
+<!-- ===== GALLERY ===== -->
+<div class="test" id="gallery">
+  <a href="#" class="a">
+    <img src="https://www.dontcrampmystyle.co.uk/wp-content/uploads/2019/05/flamingo-aruba-reneissance-island-141-of-94-1536x1024.jpg"
+         data-hover="https://animals.sandiegozoo.org/sites/default/files/2016-08/animals_hero_bald_eagle.jpg" alt="Flamingo">
+    Link&nbsp;1
+  </a>
+  <a href="#" class="a">
+    <img src="https://images.unsplash.com/photo-1526336024174-e58f5cdd8e13?w=1536"
+         data-hover="https://animals.sandiegozoo.org/sites/default/files/2016-08/animals_hero_bald_eagle.jpg" alt="Parrot">
+    Link&nbsp;2
+  </a>
+  <a href="#" class="a">
+    <img src="https://images.unsplash.com/photo-1504198458649-3128b932f49b?w=1536"
+         data-hover="https://animals.sandiegozoo.org/sites/default/files/2016-08/animals_hero_bald_eagle.jpg" alt="Macaw">
+    Link&nbsp;3
+  </a>
+  <a href="#" class="a">
+    <img src="https://images.unsplash.com/photo-1465310477141-c8b2a01fe057?w=1536"
+         data-hover="https://animals.sandiegozoo.org/sites/default/files/2016-08/animals_hero_bald_eagle.jpg" alt="Toucan">
+    Link&nbsp;4
+  </a>
+</div>
+
+<!-- ===== FORM ===== -->
+<form id="subForm">
+  <label>
+    Subscribe for bird news:
+    <input type="email" id="email" placeholder="you@example.com" required maxlength="80">
+  </label>
+  <div class="char-count" id="counter">0 / 40</div>
+  <button type="submit">Join</button>
+</form>
+
+<div id="sizeBadge"></div> <!-- viewport + time badge -->
+
+<script>
+/* ============ DOMContentLoaded ============ */
+document.addEventListener('DOMContentLoaded',()=>{
+  // Insert marquee banner just after <body> start
+  const marquee=document.createElement('marquee');
+  marquee.id='birdBanner';
+  marquee.textContent='BIRDS';
+  marquee.behavior='scroll';
+  marquee.direction='left';
+  marquee.scrollAmount=6;
+  document.body.insertBefore(marquee,document.body.firstChild.nextSibling);
+});
+
+/* ============ Mouse hover swap + bg ============ */
+document.querySelectorAll('#gallery a').forEach(link=>{
+  const img=link.querySelector('img');
+  const orig=img.src, hover=img.dataset.hover;
+  link.addEventListener('mouseenter',()=>{
+    img.src=hover; link.classList.add('hover-bg');
+  });
+  link.addEventListener('mouseleave',()=>{
+    img.src=orig; link.classList.remove('hover-bg');
+  });
+});
+
+/* colour the first two links (requirement from earlier) */
+const links=document.getElementsByClassName('a');
+if(links[0]) links[0].style.color='red';
+if(links[1]) links[1].style.color='green';
+
+/* ============ Keyboard events 1‑4 ============ */
+const imgs=document.querySelectorAll('#gallery img');
+const eagleURL='https://animals.sandiegozoo.org/sites/default/files/2016-08/animals_hero_bald_eagle.jpg';
+function clearKbd(){document.querySelectorAll('.kbd-bg').forEach(el=>el.classList.remove('kbd-bg'));}
+
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){clearKbd();return;}
+  if(!/^[1-4]$/.test(e.key))return;
+  const idx=Number(e.key)-1, link=links[idx], img=link.querySelector('img');
+  if(img.src===eagleURL){
+    img.src=img.dataset.origBackup;link.classList.remove('kbd-bg');
+  }else{
+    img.dataset.origBackup=img.src;img.src=eagleURL;
+    clearKbd();link.classList.add('kbd-bg');
+  }
+});
+
+/* ============ Form events ============ */
+const email=document.getElementById('email');
+const counter=document.getElementById('counter');
+const form=document.getElementById('subForm');
+const maxChars=40;
+
+email.addEventListener('focus',()=>email.classList.add('focus-bg'));
+email.addEventListener('blur', ()=>email.classList.remove('focus-bg'));
+email.addEventListener('input',()=>{
+  const len=email.value.length;
+  counter.textContent=`${len} / ${maxChars}`;
+  if(len>maxChars){
+    email.classList.add('error-bg');counter.style.color='crimson';
+  }else{
+    email.classList.remove('error-bg');counter.style.color='#666';
+  }
+});
+form.addEventListener('submit',e=>{
+  e.preventDefault();
+  alert(`Thanks, ${email.value}! 🦅`);
+  email.value='';counter.textContent='0 / 40';
+  email.classList.remove('error-bg');
+  form.classList.add('flash-bg');
+  setTimeout(()=>form.classList.remove('flash-bg'),800);
+});
+
+/* ============ Window events ============ */
+const badge=document.getElementById('sizeBadge');
+function formatTime(){
+  const d=new Date();
+  return d.toLocaleTimeString(undefined,{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+}
+function updateBadge(){
+  badge.textContent=`${innerWidth}px × ${innerHeight}px  |  ${formatTime()}`;
+}
+
+/* load */
+window.addEventListener('load',()=>{
+  document.getElementById('title').style.cssText='opacity:1;transform:translateY(0)';
+  updateBadge();
+});
+
+/* resize */
+window.addEventListener('resize',updateBadge);
+
+/* scroll (sticky gallery + flash peach) */
+const gallery=document.getElementById('gallery');
+const stickyOffset=gallery.offsetTop;
+let scrollTimeout;
+window.addEventListener('scroll',()=>{
+  if(pageYOffset>stickyOffset) gallery.classList.add('sticky');
+  else gallery.classList.remove('sticky');
+
+  document.body.style.backgroundColor='var(--scroll-bg)';
+  clearTimeout(scrollTimeout);
+  scrollTimeout=setTimeout(()=>document.body.style.backgroundColor='',300);
+});
+
+/* beforeunload confirm */
+window.addEventListener('beforeunload',e=>{
+  e.preventDefault();e.returnValue='';
+});
+</script>
+</body>
+</html>

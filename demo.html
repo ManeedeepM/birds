@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Hover Birds</title>
+  <style>
+    .gallery img {
+      margin: 10px;
+      border-radius: 8px;
+      transition: 0.3s ease;
+      border: 2px solid #ccc;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="gallery">
+    <!-- 🔹 Image 1: Flamingo -->
+    <img
+      src="https://www.dontcrampmystyle.co.uk/wp-content/uploads/2019/05/flamingo-aruba-reneissance-island-141-of-94-1536x1024.jpg"
+      data-hover="https://animals.sandiegozoo.org/sites/default/files/2016-08/animals_hero_bald_eagle.jpg"
+      alt="Flamingo"
+      width="400"
+      height="250"
+    />
+
+    <!-- 🔹 Image 2: Parrot -->
+    <img
+      src="https://images.unsplash.com/photo-1526336024174-e58f5cdd8e13?w=1536"
+      data-hover="https://animals.sandiegozoo.org/sites/default/files/2016-08/animals_hero_bald_eagle.jpg"
+      alt="Eagle"
+      width="400"
+      height="250"
+    />
+  </div>
+
+  <script>
+    // Select all images that have a 'data-hover' attribute
+    document.querySelectorAll('img[data-hover]').forEach(img => {
+      const originalSrc = img.src;
+      const hoverSrc = img.dataset.hover;
+
+      // On mouse enter: change to eagle
+      img.addEventListener('mouseenter', () => {
+        img.src = hoverSrc;
+      });
+
+      // On mouse leave: revert back
+      img.addEventListener('mouseleave', () => {
+        img.src = originalSrc;
+      });
+    });
+  </script>
+
+</body>
+</html>
